@@ -28,18 +28,18 @@
 	
 	<bean id="sqlSessionFactory" class="org.mybatis.spring.SqlSessionFactoryBean">
 		
-	    <property name="configLocation" value="classpath:mybatis/config.xml"></property>
+	    <property name="configLocation" value="classpath:collocate/config.xml"></property>
 	    <property name="dataSource" ref="dataSource"></property>
 	    <property name="mapperLocations">
 	        <list>
-	            <value>classpath*:mybatis/mapper-*.xml</value>
+	            <value>classpath*:net/nlpeng/dao/**/mapper*.xml</value>
 	        </list>
 	    </property>
 	</bean>
 	
 	<!-- 扫描Mapper映射配置 -->
 	<bean id="mapperScannerConfigurer" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
-		<property name="basePackage" value="com.atguigu.cpes.dao"/>
+		<property name="basePackage" value="net.nlpeng.**.dao"/>
 	</bean>
 
 	<!-- 事务管理器 -->
@@ -56,7 +56,7 @@
 	</tx:advice>
 	
 	<aop:config>
-		<aop:advisor advice-ref="transactionAdvice" pointcut="execution(* com.atguigu..*Service.*(..))"/>
+		<aop:advisor advice-ref="transactionAdvice" pointcut="execution(* net.nlpeng..*Service.*(..))"/>
 	</aop:config>		
 
 </beans>

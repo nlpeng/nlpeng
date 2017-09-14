@@ -1,158 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:context="http://www.springframework.org/schema/context"
-	xmlns:p="http://www.springframework.org/schema/p"
-	xmlns:mvc="http://www.springframework.org/schema/mvc"
-	xsi:schemaLocation="http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
-		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
-
-    <!-- 启用注解功能 -->
-    <context:annotation-config />
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context.xsd http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc.xsd"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 	
-	<mvc:annotation-driven
-			validator="validator"
-			conversion-service="conversionService"
-			content-negotiation-manager="contentNegotiationManager"
-			enable-matrix-variables="true" >
-		<!--enableMatrixVariables="true">-->
-		<!-- 异步支持 默认30秒超时
-		<mvc:async-support default-timeout="30000" task-executor="executor"/>
-		 -->
-		<mvc:message-converters register-defaults="true">
-			<!-- StringHttpMessageConverter编码为UTF-8，防止乱码 -->
-			<bean class="org.springframework.http.converter.StringHttpMessageConverter">
-				<constructor-arg value="UTF-8"/>
-				<property name = "supportedMediaTypes">
-					<list>
-						<bean class="org.springframework.http.MediaType">
-							<constructor-arg index="0" value="text"/>
-							<constructor-arg index="1" value="plain"/>
-							<constructor-arg index="2" value="UTF-8"/>
-						</bean>
-						<bean class="org.springframework.http.MediaType">
-							<constructor-arg index="0" value="*"/>
-							<constructor-arg index="1" value="*"/>
-							<constructor-arg index="2" value="UTF-8"/>
-						</bean>
-					</list>
-				</property>
-			</bean>
-			
-			
-			<!-- 启动JSON格式的配置 -->
-			<bean id="jacksonMessageConverter"
-			      class="com.fangmaster.pc.common.utils.MyMappingJackson2HttpMessageConverter">
-				<!-- 解决 HttpMediaTypeNotAcceptableException: Could not find acceptable  representation -->
-				<property name="supportedMediaTypes">
-					<list>
-						<value>application/json;charset=UTF-8</value>
-					</list>
-				</property>
-			</bean>
-		</mvc:message-converters>
-		<mvc:argument-resolvers>
-			<bean class="com.fangmaster.pc.web.user.controller.bind.method.CurrentUserMethodArgumentResolver"/>
-		</mvc:argument-resolvers>
-	</mvc:annotation-driven>
-    
-    <context:component-scan base-package="net.nlpeng.*" use-default-filters="false">
-        <!-- 
-        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
-         -->
-        <context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
-    </context:component-scan>
-    
-	<!---->
-	<bean id="freemarkerConfig"  
-	      class="org.springframework.web.servlet.view.freemarker.FreeMarkerConfigurer">  
-	    <!--<property name="templateLoaderPath" value="/WEB-INF/ftl/" />  -->
-		<property name="templateLoaderPaths">
-			<list>
-				<value>/WEB-INF/ftl/</value>
-				<value>classpath:/ftl/</value>
-			</list>
-		</property>
-		
-		<property name="freemarkerSettings">
-	        <props>  
-	            <prop key="defaultEncoding">UTF-8</prop>
-	            <prop key="template_update_delay">0</prop>  
-	            <prop key="default_encoding">UTF-8</prop>  
-	            <prop key="number_format">0.##########</prop>  
-	            <prop key="datetime_format">yyyy-MM-dd HH:mm:ss</prop>  
-	            <prop key="classic_compatible">true</prop>  
-	            <prop key="template_exception_handler">ignore</prop>  
-	        </props>  
-	    </property>  
+	
+	<!--包扫描include-filter（包含）-->
+	<!--取消默认规则use-default-filters="false"-->
+	<context:component-scan base-package="net.nlpeng.*" use-default-filters="false">
+		<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"></context:include-filter>
+		<context:include-filter type="annotation" expression="org.springframework.web.bind.annotation.ControllerAdvice"></context:include-filter>
+	</context:component-scan>
+	
+	<!--视图解析器-->
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
+		<property name="prefix" value="/WEB-INF/jsp/"></property>
+		<property name="suffix" value=".jsp"></property>
 	</bean>
-    
-    <bean class="org.springframework.web.servlet.view.freemarker.FreeMarkerViewResolver"
-        p:prefix="/" p:suffix=".ftl">
-        <property name="cache" value="false" />
-        <property name="viewClass" value="org.springframework.web.servlet.view.freemarker.FreeMarkerView" />
-        <property name="contentType" value="text/html;charset=UTF-8"></property>
-        <property name="exposeRequestAttributes" value="true" />
-        <property name="exposeSessionAttributes" value="true" />
-        <property name="exposeSpringMacroHelpers" value="true" />
-        <property name="requestContextAttribute" value="base"></property>
-        <property name="order" value="0"></property>
-    </bean>
-    
-	
-    <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
-        <property name="viewClass" value="org.springframework.web.servlet.view.JstlView"></property>
-        <property name="prefix" value="/WEB-INF/jsp/"></property>
-        <property name="suffix" value=".jsp"></property>
-    </bean>
-    
-    <bean id="exceptionResolver"  
-        class="org.springframework.web.servlet.handler.SimpleMappingExceptionResolver">  
-        <property name="exceptionMappings">  
-            <props>
-            </props>  
-        </property>  
-    </bean>
-	
-	
-	<bean id="multipartResolver" class="net.nlpeng.common.CPESCommonsMultipartResolver" p:defaultEncoding="UTF-8">
-		<property name="maxUploadSize" value="2097152"/>
-		<property name="resolveLazily" value="true"/>
-	</bean>
-	<!-- 以下 validator  ConversionService 在使用 mvc:annotation-driven 会 自动注册-->
-	<bean id="validator" class="org.springframework.validation.beanvalidation.LocalValidatorFactoryBean">
-		<property name="providerClass" value="org.hibernate.validator.HibernateValidator"/>
-		<!-- 如果不加默认到 使用classpath下的 ValidationMessages.properties
-		<property name="validationMessageSource" ref="messageSource"/>
-		-->
-	</bean>
-   
-    <!--<mvc:interceptors>
-        <bean class="com.atguigu.cpes.interceptor.AuthInterceptor"></bean>
-    </mvc:interceptors>-->
-	
-	<!-- 内容协商管理器  -->
-	<!--1、首先检查路径扩展名（如my.pdf）；2、其次检查Parameter（如my?format=pdf）；3、检查Accept Header-->
-	<bean id="contentNegotiationManager" class="org.springframework.web.accept.ContentNegotiationManagerFactoryBean">
-		<!-- 扩展名至mimeType的映射,即 /user.json => application/json -->
-		<property name="favorPathExtension" value="true"/>
-		<!-- 用于开启 /userinfo/123?format=json 的支持 -->
-		<property name="favorParameter" value="true"/>
-		<property name="parameterName" value="format"/>
-		<!-- 是否忽略Accept Header -->
-		<property name="ignoreAcceptHeader" value="false"/>
-		
-		<property name="mediaTypes"> <!--扩展名到MIME的映射；favorPathExtension, favorParameter是true时起作用  -->
-			<value>
-				json=application/json
-				xml=application/xml
-				html=text/html
-				htm=text/html
-			</value>
-		</property>
-		<!-- 默认的content type -->
-		<property name="defaultContentType" value="text/html"/>
-	</bean>
+	<!--两个标配-->
+	<mvc:default-servlet-handler/>
+	<mvc:annotation-driven/>
 	
 </beans>

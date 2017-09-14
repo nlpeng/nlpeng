@@ -5,6 +5,8 @@
 
 <configuration>
 	<settings>
+		<!--驼峰命名-->
+		
 		<!-- 只设置需要的,其他使用默认值 -->
 		<!-- 开启缓存,默认就是开启的,2层开关,需要在Mapper文件中也指定 cache 标签才会真正使用缓存 -->
 		<setting name="cacheEnabled" value="false" />

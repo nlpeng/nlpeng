@@ -8,52 +8,41 @@
   
   <!--加载spring配置文件-->
   <context-param>
-    <param-name>
-      contextConfigLocation
-    </param-name>
-    <param-value>
-      classpath*:spring/spring-*.xml,
-    </param-value>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath*:spring/spring-*.xml</param-value>
   </context-param>
   
-  <!--this listener must be defined before the spring listener-->
-  <listener>
-    <listener-class>com.alibaba.dubbo.remoting.http.servlet.BootstrapListener</listener-class>
-  </listener>
   <!--spring监听器-->
   <listener>
     <listener-class>net.nlpeng.web.listener.ServerStartupListener</listener-class>
   </listener>
   
-  <!-- 防止spring内存溢出监听器 -->
-  <listener>
-    <listener-class>org.springframework.web.util.IntrospectorCleanupListener</listener-class>
-  </listener>
-  
+  <!-- 加载springmvc配置文件 -->
   <servlet>
-    <servlet-name>dispatcher</servlet-name>
-    <servlet-class>com.alibaba.dubbo.remoting.http.servlet.DispatcherServlet</servlet-class>
-    <load-on-startup>1</load-on-startup>
-  </servlet>
-  
-  <servlet-mapping>
-    <servlet-name>dispatcher</servlet-name>
-    <url-pattern>/services/*</url-pattern>
-  </servlet-mapping>
-  
-  <filter>
-    <filter-name>HiddenHttpMethodFilter</filter-name>
-    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
-  </filter>
-  <filter-mapping>
-    <filter-name>HiddenHttpMethodFilter</filter-name>
     <servlet-name>springmvc</servlet-name>
-  </filter-mapping>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <init-param>
+      <param-name>contextConfigLocation</param-name>
+      <param-value>classpath*:spring/springmvc-context.xml</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+    <async-supported>true</async-supported>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springmvc</servlet-name>
+    <url-pattern>*.htm</url-pattern>
+    <url-pattern>*.do</url-pattern>
+    <url-pattern>/</url-pattern>
+  </servlet-mapping>
+  <session-config>
+    <session-timeout>60</session-timeout>
+  </session-config>
   
   <!--编码-->
   <filter>
-    <filter-name>encoding</filter-name>
+    <filter-name>Set Character Encoding</filter-name>
     <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <async-supported>true</async-supported>
     <init-param>
       <param-name>encoding</param-name>
       <param-value>UTF-8</param-value>
@@ -64,119 +53,24 @@
     </init-param>
   </filter>
   <filter-mapping>
-    <filter-name>encoding</filter-name>
-    <url-pattern>*.xxx</url-pattern>
+    <filter-name>Set Character Encoding</filter-name>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
   
-  <!-- 记录访问日志，比如审计之类的可用 -->
+  <!--支持Rest风格-->
   <filter>
-    <filter-name>AccessLogFilter</filter-name>
-    <filter-class>net.nlpeng.common.web.filter.AccessLogFilter</filter-class>
-    <async-supported>true</async-supported>
-    <init-param>
-      <param-name>blackListURL</param-name>
-      <param-value>/static/**,*.js,*.css,*.jpg,*.gif,*.png,*.ico,/admin/monitor/druid/**</param-value>
-    </init-param>
-    <init-param>
-      <param-name>whiteListURL</param-name>
-      <param-value>/**</param-value>
-    </init-param>
+    <filter-name>HiddenHttpMethodFilter</filter-name>
+    <filter-class>org.springframework.web.filter.HiddenHttpMethodFilter</filter-class>
   </filter>
+  <!--拦截所有-->
   <filter-mapping>
-    <filter-name>AccessLogFilter</filter-name>
+    <filter-name>HiddenHttpMethodFilter</filter-name>
     <url-pattern>/*</url-pattern>
-    <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
-  
-  <!-- shiro 安全过滤器 -->
-  <!-- The filter-name matches name of a 'shiroFilter' bean inside applicationContext.xml -->
-  <!--<filter>
-    <filter-name>shiroFilter</filter-name>
-    <filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
-    <async-supported>true</async-supported>
-    <init-param>
-      <param-name>targetFilterLifecycle</param-name>
-      <param-value>true</param-value>
-    </init-param>
-  </filter>-->
-  
-  <!--shiro-->
-  <!--<filter-mapping>
-    <filter-name>shiroFilter</filter-name>
-    <url-pattern>/*</url-pattern>
-    <dispatcher>REQUEST</dispatcher>
-  </filter-mapping>-->
-  
-  <!--权限框架shiro-->
-  <!-- 验证码过滤器需要放到Shiro之后 因为Shiro将包装HttpSession 如果不 可能造成两次的sesison id 不一样 -->
-  <!--<filter>
-    <filter-name>JCaptchaFilter</filter-name>
-    <filter-class>com.fangmaster.pc.common.web.jcaptcha.JCaptchaFilter</filter-class>
-    <async-supported>true</async-supported>
-  </filter>
-  <filter-mapping>
-    <filter-name>JCaptchaFilter</filter-name>
-    <url-pattern>/jcaptcha.jpg</url-pattern>
-  </filter-mapping>-->
-  
-  <!-- springmvc -->
-  <servlet>
-    <servlet-name>springmvc</servlet-name>
-    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
-    <init-param>
-      <param-name>contextConfigLocation</param-name>
-      <param-value>classpath:spring/springmvc-context.xml</param-value>
-    </init-param>
-    <load-on-startup>1</load-on-startup>
-    <async-supported>true</async-supported>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>springmvc</servlet-name>
-    <url-pattern>/</url-pattern>
-    <url-pattern>*.htm</url-pattern>
-    <url-pattern>*.do</url-pattern>
-  </servlet-mapping>
-  
-  <!---->
-  <session-config>
-    <session-timeout>60</session-timeout>
-  </session-config>
-  
-  <!-- 图形验证码 -->
-  <servlet>
-    <servlet-name>verifyCode</servlet-name>
-    <servlet-class>net.nlpeng.verificationCode.AuthImage</servlet-class>
-  </servlet>
-  <servlet-mapping>
-    <servlet-name>verifyCode</servlet-name>
-    <url-pattern>/verifyCode</url-pattern>
-  </servlet-mapping>
-  
-  <!-- 错误页面映射 -->
-  <error-page>
-    <error-code>404</error-code>
-    <location>/WEB-INF/jsp/error/404.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>400</error-code>
-    <location>/WEB-INF/jsp/error/error.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>500</error-code>
-    <location>/WEB-INF/jsp/error/error.jsp</location>
-  </error-page>
-  <error-page>
-    <error-code>503</error-code>
-    <location>/WEB-INF/jsp/error/error.jsp</location>
-  </error-page>
-  <error-page>
-    <exception-type>java.lang.Exception</exception-type>
-    <location>/WEB-INF/jsp/error/error.jsp</location>
-  </error-page>
   
   <!--访问首页-->
   <welcome-file-list>
-    <welcome-file>index</welcome-file>
+    <welcome-file>index.jsp</welcome-file>
   </welcome-file-list>
   
 </web-app>

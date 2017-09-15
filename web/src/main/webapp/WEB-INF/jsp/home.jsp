@@ -12,5 +12,7 @@
 </head>
 <body>
 <h4>这是个新项目</h4>
+
+<a href="user/login.htm">这是个登陆页面</a>
 </body>
 </html>

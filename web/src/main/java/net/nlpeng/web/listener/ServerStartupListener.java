@@ -7,6 +7,7 @@ import javax.servlet.ServletContextEvent;
 
 public class ServerStartupListener extends ContextLoaderListener {
 
+	@Override
 	public void contextInitialized(ServletContextEvent event) {
 		// 初始化Spring的环境
 		super.contextInitialized(event);
